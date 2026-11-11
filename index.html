@@ -3,141 +3,350 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ağlayan Rakun ve Ağlayan Nör</title>
 <style>
 *{box-sizing:border-box}
 body{
- margin:0;font-family:Arial,sans-serif;color:white;
- background:linear-gradient(135deg,#101a3d,#34215d);
- text-align:center;padding:18px
+ margin:0;background:#17152e;color:white;
+ font-family:Arial,sans-serif;text-align:center;
 }
-h1{color:#ffe477;text-shadow:0 3px 8px #000;font-size:clamp(25px,5vw,40px)}
-#game{max-width:950px;margin:auto}
-.scene{
- background:linear-gradient(#70c9ff 0 65%,#4eaa61 65%);
- border:5px solid #fff;border-radius:22px;padding:18px;
- min-height:340px;box-shadow:0 8px 25px #0008
+h1{color:#ffe477;text-shadow:2px 3px #542c65;padding:8px}
+#hud{
+ display:flex;justify-content:center;gap:12px;
+ flex-wrap:wrap;padding:8px;
 }
-.cloud{font-size:35px}
-.characters{display:flex;justify-content:center;gap:35px;flex-wrap:wrap;margin-top:25px}
-.person{
- background:#fff1d5;color:#28203e;border:4px solid #49335e;
- border-radius:20px;width:210px;padding:12px;cursor:pointer;
- box-shadow:0 7px 0 #352344;transition:.15s
+.info{
+ background:#29264c;padding:10px 16px;
+ border-radius:12px;border:2px solid #7167a9;
 }
-.person:hover{transform:translateY(-5px)}
-.person:active{transform:translateY(3px);box-shadow:0 2px 0 #352344}
-.human{height:145px;position:relative;margin:auto;width:110px}
-.hair{position:absolute;top:3px;left:17px;width:76px;height:35px;
- background:#35221d;border-radius:45px 45px 10px 10px;z-index:2}
-.head{position:absolute;top:18px;left:21px;width:68px;height:77px;
- background:#f1bd91;border-radius:45% 45% 48% 48%;border:2px solid #a76c51}
-.eye{position:absolute;top:29px;left:17px;width:7px;height:9px;
- background:#222;border-radius:50%;box-shadow:27px 0 #222}
-.mouth{position:absolute;top:53px;left:26px;font-size:20px}
-.tear{position:absolute;top:48px;left:13px;color:#159de5;font-size:23px;
- animation:cry .8s infinite alternate}
-.tear.right{left:44px;animation-delay:.3s}
-@keyframes cry{to{transform:translateY(16px)}}
-.body{position:absolute;bottom:0;left:7px;width:96px;height:48px;
- background:#e15c75;border-radius:35px 35px 12px 12px;border:2px solid #913b59}
-.nor .body{background:#7565dc}
+#world{
+ position:relative;width:min(960px,96vw);
+ height:530px;margin:auto;overflow:hidden;
+ border:5px solid white;border-radius:18px;
+ background:#75cafa;
+}
+#world:before{
+ content:"";position:absolute;bottom:0;left:0;
+ width:100%;height:65%;background:#62b96c;
+}
+.cloud{position:absolute;top:25px;font-size:40px}
+.road{
+ position:absolute;bottom:0;left:0;width:100%;height:100px;
+ background:#777b83;border-top:5px solid #e7e1bb;
+}
+.road:after{
+ content:"";position:absolute;top:44px;left:0;width:100%;
+ border-top:5px dashed white;
+}
+.house{
+ position:absolute;bottom:100px;width:150px;height:120px;
+ background:#f5bd79;border:4px solid #854d49;
+}
+.house:before{
+ content:"";position:absolute;left:-15px;top:-45px;
+ width:170px;height:55px;background:#b84f58;
+ clip-path:polygon(50% 0,100% 100%,0 100%);
+}
+.door{
+ position:absolute;bottom:0;left:53px;
+ width:40px;height:65px;background:#74452c;
+}
 .shop{
- margin-top:20px;padding:20px;background:linear-gradient(135deg,#ffbd59,#ed7c38);
- border:4px solid #ffe5a3;border-radius:20px;color:#402414
+ position:absolute;right:35px;bottom:100px;
+ width:190px;height:145px;background:#ffe1a0;
+ border:5px solid #874a39;border-radius:8px;
+ color:#3c2631;font-weight:bold;
 }
-.shop h2{margin:0 0 8px}
-button{
- border:0;border-radius:12px;padding:13px 19px;
- font-size:16px;font-weight:bold;cursor:pointer
+.shop-top{
+ background:#ed7652;padding:12px;color:white;
+ font-size:19px;
 }
-#get{background:#ffe65c;color:#392500}
+.window{
+ margin:8px auto;background:#9ae5ed;
+ width:90px;padding:10px;border:3px solid #874a39;
+}
+#people{
+ position:absolute;inset:0;z-index:4;
+ pointer-events:none;
+}
+.player{
+ position:absolute;bottom:100px;left:100px;
+ width:65px;height:125px;
+ transform:translateX(-50%);
+ transition:none;
+}
+.person-head{
+ position:absolute;top:0;left:10px;
+ width:45px;height:50px;
+ background:#f1bd91;border:3px solid #9b624c;
+ border-radius:45% 45% 48% 48%;
+}
+.hair{
+ position:absolute;top:-5px;left:8px;
+ width:48px;height:19px;background:#35221d;
+ border-radius:50% 50% 10% 10%;
+}
+.eyes{
+ position:absolute;top:17px;left:9px;
+ width:6px;height:7px;background:#222;
+ border-radius:50%;
+ box-shadow:19px 0 #222;
+}
+.mouth{
+ position:absolute;top:29px;left:15px;
+ font-size:13px;
+}
+.tears{
+ position:absolute;top:27px;left:5px;
+ color:#159de5;font-size:16px;
+ animation:cry .6s infinite alternate;
+}
+.tears.r{left:27px;animation-delay:.3s}
+@keyframes cry{
+ to{transform:translateY(12px)}
+}
+.person-body{
+ position:absolute;top:48px;left:0;
+ width:65px;height:48px;background:#e15c75;
+ border:3px solid #923c59;
+ border-radius:17px 17px 8px 8px;
+}
+.nor .person-body{background:#7565dc}
+.legs{
+ position:absolute;top:92px;left:12px;
+ width:13px;height:30px;background:#29304e;
+ border-radius:5px;
+ box-shadow:27px 0 #29304e;
+}
+.name{
+ position:absolute;top:-22px;left:-20px;
+ width:105px;font-weight:bold;
+ color:white;text-shadow:1px 2px black;
+ font-size:12px;
+}
+#uncle{
+ position:absolute;right:95px;bottom:235px;
+ z-index:5;font-size:48px;
+ cursor:pointer;
+}
+#uncle span{
+ display:block;font-size:13px;color:white;
+ text-shadow:1px 2px black;
+}
 #message{
- margin:18px auto;padding:16px;background:#111b38;
- border:2px solid #8c83d9;border-radius:15px;min-height:55px;
- font-size:18px;max-width:700px
+ width:min(900px,95vw);min-height:65px;
+ margin:12px auto;background:#29264c;
+ border:2px solid #9385da;border-radius:13px;
+ padding:15px;font-size:17px;
 }
-#stick{font-size:23px}
+#controls{
+ display:flex;justify-content:center;gap:18px;
+ align-items:center;padding:10px;flex-wrap:wrap;
+}
+.pad{
+ display:grid;grid-template-columns:50px 50px 50px;
+ grid-template-rows:45px 45px 45px;gap:4px;
+}
+.pad button{background:#6354a6;color:white}
+button{
+ border:0;border-radius:10px;padding:12px;
+ font-weight:bold;cursor:pointer;
+}
+.action{background:#ffe477;color:#392b18}
+#market{
+ margin:15px auto;width:min(900px,95vw);
+ background:#e99a45;color:#3e251c;
+ border:5px solid #ffda8a;border-radius:17px;
+ padding:15px;
+}
+#market h2{margin:5px}
 #reset{background:#a9d9ff;color:#17234b}
+#stick{font-size:30px}
+@media(max-width:600px){
+ #world{height:470px}
+ .shop{right:5px;width:145px}
+ .house{left:5px;transform:scale(.8);transform-origin:bottom left}
+ #uncle{right:65px}
+}
 </style>
 </head>
 <body>
-<div id="game">
 <h1>😭 AĞLAYAN RAKUN & AĞLAYAN NÖR 😭</h1>
-<div class="scene">
- <div class="cloud">☁️ ☀️ ☁️</div>
- <h2 style="color:#17375c">Şehir Parkı</h2>
- <div class="characters">
-  <button class="person" id="rakun">
-   <div class="human">
-    <div class="hair"></div>
-    <div class="head"><div class="eye"></div><div class="mouth">☹️</div>
-     <span class="tear">💧</span><span class="tear right">💧</span>
-    </div>
-    <div class="body"></div>
+
+<div id="hud">
+ <div class="info">🪵 Sopa: <span id="inventory">Yok</span></div>
+ <div class="info">🎮 Yürümek için yön tuşlarını kullan</div>
+</div>
+
+<div id="world">
+ <div class="cloud" style="left:40px">☁️</div>
+ <div class="cloud" style="left:370px">☁️</div>
+ <div class="cloud" style="right:80px">☀️</div>
+
+ <div class="house" style="left:45px">
+  <div class="door"></div>
+ </div>
+
+ <div class="shop">
+  <div class="shop-top">🏪 MARKET</div>
+  <div class="window">🥤 🍫</div>
+  <div>MARKET AMCA</div>
+ </div>
+
+ <div id="uncle" onclick="talkUncle()">
+  🧔
+  <span>Marketçi Amca</span>
+ </div>
+
+ <div class="road"></div>
+
+ <div id="people">
+  <div class="player" id="rakun">
+   <div class="name">Ağlayan Rakun</div>
+   <div class="person-head">
+    <div class="hair"></div><div class="eyes"></div>
+    <div class="mouth">☹</div>
+    <div class="tears">💧</div>
+    <div class="tears r">💧</div>
    </div>
-   <h3>Ağlayan Rakun</h3>
-   <small>😢 Çok üzgün...</small>
-  </button>
-  <button class="person nor" id="nor">
-   <div class="human">
+   <div class="person-body"></div>
+   <div class="legs"></div>
+  </div>
+
+  <div class="player nor" id="nor">
+   <div class="name">Ağlayan Nör</div>
+   <div class="person-head">
     <div class="hair" style="background:#17152d"></div>
-    <div class="head"><div class="eye"></div><div class="mouth">☹️</div>
-     <span class="tear">💧</span><span class="tear right">💧</span>
-    </div>
-    <div class="body"></div>
+    <div class="eyes"></div>
+    <div class="mouth">☹</div>
+    <div class="tears">💧</div>
+    <div class="tears r">💧</div>
    </div>
-   <h3>Ağlayan Nör</h3>
-   <small>😭 Çok üzgün...</small>
-  </button>
+   <div class="person-body"></div>
+   <div class="legs"></div>
+  </div>
  </div>
 </div>
 
-<div class="shop">
+<div id="message">
+ Market Amca: Hoş geldiniz! Size bedava bir sopa vereyim!
+</div>
+
+<div id="controls">
+ <div class="pad">
+  <span></span>
+  <button onclick="move(0,-1)">⬆️</button>
+  <span></span>
+  <button onclick="move(-1,0)">⬅️</button>
+  <button onclick="move(0,1)">⬇️</button>
+  <button onclick="move(1,0)">➡️</button>
+ </div>
+ <button class="action" onclick="interact()">E ile etkileşim</button>
+</div>
+
+<div id="market">
  <h2>🏪 MARKET AMCA</h2>
  <p>🧔 Amca: Hoş geldiniz! Size bedava bir sopa vereyim!</p>
  <div id="stick">🪵</div>
- <button id="get">🎁 Bedava sopayı al</button>
+ <button class="action" onclick="getStick()">🎁 Bedava sopayı al</button>
 </div>
 
-<div id="message">Önce market amcadan bedava sopayı al!</div>
-<button id="reset">🔄 Oyunu yeniden başlat</button>
-</div>
+<button id="reset" onclick="location.reload()">🔄 Oyunu yeniden başlat</button>
 
 <script>
-let hasStick=false;
-let done={rakun:false,nor:false};
-
+const world=document.getElementById("world");
 const message=document.getElementById("message");
 
-document.getElementById("get").onclick=()=>{
- hasStick=true;
- document.getElementById("stick").textContent="🪵 ✅";
- message.textContent="Market Amca: Sopayı bedava verdim! Şimdi karakterlere tıklayabilirsin.";
+let hasStick=false;
+let active="rakun";
+let positions={
+ rakun:{x:300,y:0},
+ nor:{x:430,y:0}
 };
+let done={rakun:false,nor:false};
+let keys={};
 
-function clickPerson(id,name){
+function render(){
+ for(let id of ["rakun","nor"]){
+  let p=positions[id];
+  let el=document.getElementById(id);
+  el.style.left=p.x+"px";
+  el.style.bottom=(100+p.y)+"px";
+ }
+}
+render();
+
+function move(dx,dy){
+ let p=positions[active];
+ p.x=Math.max(40,Math.min(world.clientWidth-40,p.x+dx*18));
+ p.y=Math.max(0,Math.min(180,p.y+dy*18));
+ render();
+}
+
+function getStick(){
+ hasStick=true;
+ document.getElementById("inventory").textContent="Var 🪵";
+ document.getElementById("stick").textContent="🪵 ✅";
+ message.textContent="Market Amca: Sopayı bedava verdim! Şimdi karakterlere yaklaş ve E tuşuna bas.";
+}
+
+function talkUncle(){
+ message.textContent="Market Amca: Evlatlar, neden ağlıyorsunuz? Biraz neşelenin!";
+}
+
+function interact(){
  if(!hasStick){
   message.textContent="Önce market amcadan bedava sopayı almalısın!";
   return;
  }
- if(done[id]){
-  message.textContent=name+": YouTuber abi, özür dilerim!";
+
+ let p=positions[active];
+ if(p.x>world.clientWidth-250 && p.y<110){
+  talkUncle();
   return;
  }
- done[id]=true;
- const person=document.getElementById(id);
- person.querySelector(".human").innerHTML=
- '<div class="hair"></div><div class="head"><div class="eye"></div><div class="mouth">😊</div></div><div class="body"></div>';
- person.querySelector("small").textContent="😊 Özür diledi!";
- message.textContent=name+": YouTuber abi, özür dilerim!";
+
+ if(done[active]){
+  message.textContent=(active==="rakun"?"Ağlayan Rakun":"Ağlayan Nör")+": YouTuber abi, özür dilerim!";
+  return;
+ }
+
+ done[active]=true;
+ message.textContent=(active==="rakun"?"Ağlayan Rakun":"Ağlayan Nör")+": YouTuber abi, özür dilerim!";
+ document.getElementById(active).querySelector(".mouth").textContent="😊";
 }
 
-document.getElementById("rakun").onclick=()=>clickPerson("rakun","Ağlayan Rakun");
-document.getElementById("nor").onclick=()=>clickPerson("nor","Ağlayan Nör");
+document.addEventListener("keydown",e=>{
+ if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();
+ keys[e.key.toLowerCase()]=true;
 
-document.getElementById("reset").onclick=()=>location.reload();
+ if(e.key==="e" || e.key==="E")interact();
+ if(e.key==="1")active="rakun";
+ if(e.key==="2")active="nor";
+});
+
+document.addEventListener("keyup",e=>{
+ keys[e.key.toLowerCase()]=false;
+});
+
+setInterval(()=>{
+ let dx=0,dy=0;
+ if(keys["arrowup"]||keys["w"])dy=1;
+ if(keys["arrowdown"]||keys["s"])dy=-1;
+ if(keys["arrowleft"]||keys["a"])dx=-1;
+ if(keys["arrowright"]||keys["d"])dx=1;
+ if(dx||dy)move(dx,dy);
+},90);
+
+let padButtons=document.querySelectorAll(".pad button");
+function selectCharacter(id){
+ active=id;
+ message.textContent=(id==="rakun"?"Ağlayan Rakun":"Ağlayan Nör")+" seçildi. Şimdi hareket edebilirsin.";
+}
+document.getElementById("rakun").onclick=()=>selectCharacter("rakun");
+document.getElementById("nor").onclick=()=>selectCharacter("nor");
+
 </script>
 </body>
 </html>
