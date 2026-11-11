@@ -8,63 +8,118 @@
 <style>
 *{box-sizing:border-box}
 body{
- margin:0;background:#17152e;color:white;
- font-family:Arial;text-align:center;
+ margin:0;
+ background:linear-gradient(135deg,#17152e,#30234c);
+ color:white;
+ font-family:Arial,sans-serif;
+ text-align:center;
+ padding:8px;
 }
-h1{color:#ffe477;font-size:clamp(22px,4vw,36px);padding:8px}
+h1{
+ color:#ffe477;
+ font-size:clamp(21px,4vw,35px);
+ text-shadow:2px 3px #542c65;
+}
 #hud{
- display:flex;justify-content:center;gap:10px;
- flex-wrap:wrap;padding:8px;
+ display:flex;
+ justify-content:center;
+ flex-wrap:wrap;
+ gap:8px;
+ margin:10px auto;
 }
 .info{
- background:#29264c;padding:10px 15px;
- border:2px solid #8277bd;border-radius:12px;
+ background:#29264c;
+ padding:10px 14px;
+ border:2px solid #8277bd;
+ border-radius:12px;
+ font-weight:bold;
 }
 #game{
- width: min(960px,98vw);
+ width:min(960px,98vw);
  margin:auto;
 }
 canvas{
- width:100%;height:auto;
- display:block;border:5px solid white;
- border-radius:17px;background:#e8c58d;
+ width:100%;
+ height:auto;
+ display:block;
+ border:5px solid white;
+ border-radius:17px;
+ background:#9cdb73;
  touch-action:none;
 }
 #message{
- min-height:65px;background:#29264c;
+ width:min(900px,96vw);
+ min-height:65px;
+ margin:12px auto;
+ background:#29264c;
  border:2px solid #9385da;
- border-radius:13px;padding:15px;
- margin:12px auto;width:95%;
+ border-radius:13px;
+ padding:14px;
  font-size:16px;
+ display:flex;
+ justify-content:center;
+ align-items:center;
 }
 #controls{
- display:flex;justify-content:center;
- align-items:center;gap:25px;
- padding:10px;flex-wrap:wrap;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ gap:20px;
+ flex-wrap:wrap;
+ padding:12px;
 }
-.pad{
- display:grid;
- grid-template-columns:55px 55px 55px;
- grid-template-rows:48px 48px 48px;
- gap:4px;
+#joystick{
+ width:155px;
+ height:155px;
+ border-radius:50%;
+ background:#ffffff24;
+ border:4px solid #b8a8ff;
+ position:relative;
+ touch-action:none;
+ box-shadow:0 5px 15px #0005;
 }
-button{
- border:0;border-radius:12px;
- padding:12px;font-weight:bold;
- cursor:pointer;touch-action:none;
+#thumb{
+ width:65px;
+ height:65px;
+ position:absolute;
+ left:41px;
+ top:41px;
+ border-radius:50%;
+ background:linear-gradient(135deg,#a995ff,#6654b9);
+ border:4px solid white;
+ box-shadow:0 4px 10px #0008;
+ pointer-events:none;
 }
-.pad button{background:#6555aa;color:white;font-size:21px}
-.pad span{visibility:hidden}
-.action{background:#ffe477;color:#392500}
+.joystick-label{
+ font-size:12px;
+ color:#ddd4ff;
+ margin-top:4px;
+}
+.action{
+ background:#ffe477;
+ color:#392500;
+ padding:15px 20px;
+ font-size:16px;
+ border-radius:12px;
+}
 #market{
  background:linear-gradient(135deg,#ffbd59,#ed7c38);
- color:#402414;width:95%;max-width:900px;
- margin:12px auto;padding:16px;
- border:4px solid #ffe5a3;border-radius:18px;
+ color:#402414;
+ width:min(900px,96vw);
+ margin:12px auto;
+ padding:17px;
+ border:4px solid #ffe5a3;
+ border-radius:18px;
 }
 #market h2{margin:5px}
-#reset{background:#a9d9ff;color:#17234b}
-small{color:#dedcf8}
+#stick{font-size:32px;margin:8px}
+#reset{
+ background:#a9d9ff;
+ color:#17234b;
+ margin:12px;
+ padding:13px 20px;
+}
+small{color:#5b3827}
 </style>
 </head>
 <body>
@@ -72,13 +127,13 @@ small{color:#dedcf8}
 <h1>😭 AĞLAYAN RAKUN & AĞLAYAN NÖR 😭</h1>
 
 <div id="hud">
- <div class="info">🏃 Hız: %150</div>
+ <div class="info">🏃 YouTuber Abi: %150 hız</div>
  <div class="info">🪵 Sopa: <span id="inventory">Yok</span></div>
- <div class="info">🎯 Yakalanan: <span id="caught">0/2</span></div>
+ <div class="info">🎯 Yakalama: <span id="caught">0</span></div>
 </div>
 
 <div id="game">
-<canvas id="canvas" width="900" height="520"></canvas>
+ <canvas id="canvas" width="900" height="520"></canvas>
 </div>
 
 <div id="message">
@@ -86,13 +141,11 @@ small{color:#dedcf8}
 </div>
 
 <div id="controls">
- <div class="pad">
-  <span></span>
-  <button data-dir="up">⬆️</button>
-  <span></span>
-  <button data-dir="left">⬅️</button>
-  <button data-dir="down">⬇️</button>
-  <button data-dir="right">➡️</button>
+ <div>
+  <div id="joystick">
+   <div id="thumb"></div>
+  </div>
+  <div class="joystick-label">JOYSTICK İLE HAREKET ET</div>
  </div>
  <button class="action" id="interact">E - ETKİLEŞİM</button>
 </div>
@@ -100,9 +153,9 @@ small{color:#dedcf8}
 <div id="market">
  <h2>🏪 MARKET AMCA</h2>
  <p>🧔 Amca: Hoş geldiniz! Size bedava bir sopa vereyim!</p>
- <div style="font-size:32px" id="stick">🪵</div>
+ <div id="stick">🪵</div>
  <button class="action" id="get">🎁 Bedava sopayı al</button>
- <p><small>Önce amcadan sopanı al, sonra Rakun ve Nör'ü yakala!</small></p>
+ <p><small>Önce sopanı al, sonra Rakun ve Nör'ü kovala!</small></p>
 </div>
 
 <button id="reset" onclick="location.reload()">🔄 Oyunu yeniden başlat</button>
@@ -115,40 +168,38 @@ const message=document.getElementById("message");
 
 let hasStick=false;
 let caughtCount=0;
-let gameWon=false;
-let keys={};
-let touch={up:false,down:false,left:false,right:false};
 let time=0;
+let keys={};
+let joy={x:0,y:0};
+let gameActive=true;
 
 const player={
- x:450,y:390,
- speed:105,
- color:"#e15c75",
- name:"Sen"
+ x:450,y:420,
+ speed:105
 };
 
 const npcs=[
  {
   name:"Ağlayan Rakun",
-  x:230,y:190,
+  x:220,y:210,
   speed:70,
   color:"#e15c75",
   hair:"#35221d",
   caught:false,
-  phase:0
+  phase:0,
+  cooldown:0
  },
  {
   name:"Ağlayan Nör",
-  x:650,y:180,
+  x:680,y:220,
   speed:70,
   color:"#7565dc",
   hair:"#17152d",
   caught:false,
-  phase:2
+  phase:2,
+  cooldown:0
  }
 ];
-
-const uncle={x:790,y:370};
 
 function say(t){
  message.textContent=t;
@@ -158,121 +209,191 @@ function distance(a,b){
  return Math.hypot(a.x-b.x,a.y-b.y);
 }
 
-// PARK ÇİZİMİ
+function circle(x,y,r,color){
+ ctx.fillStyle=color;
+ ctx.beginPath();
+ ctx.arc(x,y,r,0,Math.PI*2);
+ ctx.fill();
+}
+
+// ÇOCUK PARKI
 function drawPark(){
+ // Çimen
+ ctx.fillStyle="#8bcf70";
+ ctx.fillRect(0,0,W,H);
+
+ // Parkın zeminleri
  ctx.fillStyle="#e8c58d";
  ctx.fillRect(0,0,W,H);
 
- // Kum taneleri
- for(let i=0;i<180;i++){
+ // Kum desenleri
+ for(let i=0;i<220;i++){
   let x=(i*137)%W;
   let y=(i*83)%H;
   ctx.fillStyle=i%2?"#d4ad72":"#f2d9a6";
   ctx.beginPath();
-  ctx.arc(x,y,2,0,Math.PI*2);
+  ctx.arc(x,y,1.8,0,Math.PI*2);
   ctx.fill();
  }
 
- // Park yolu
- ctx.fillStyle="#d2ad7a";
- ctx.fillRect(0,300,W,90);
+ // Çim alanlar
+ ctx.fillStyle="#78b85d";
+ ctx.fillRect(0,0,W,35);
+ ctx.fillRect(0,H-28,W,28);
+ ctx.fillRect(0,0,28,H);
+ ctx.fillRect(W-28,0,28,H);
+
+ // Park yolları
+ ctx.fillStyle="#d0aa77";
+ ctx.fillRect(0,265,W,48);
+
+ // Çiçekler
+ for(let i=0;i<18;i++){
+  let x=45+(i*49)%800;
+  let y=45+(i*71)%420;
+  circle(x,y,3,"#ffe477");
+  circle(x+5,y,3,"#ff8ca7");
+ }
+
+ // Salıncak
+ drawSwing(115,120);
+
+ // Kaydırak
+ drawSlide(350,100);
+
+ // Tahterevalli
+ drawSeesaw(610,140);
+
+ // Kum havuzu
+ drawSandbox(130,390);
+
+ // Dönme dolap
+ drawCarousel(730,390);
 
  // Ağaçlar
- drawTree(75,110);
- drawTree(820,105);
- drawTree(100,445);
- drawTree(700,455);
-
- // Çalılar
- drawBush(350,95);
- drawBush(550,455);
- drawBush(410,245);
-
- // Bank
- ctx.fillStyle="#76502e";
- ctx.fillRect(330,145,100,12);
- ctx.fillRect(330,165,100,10);
- ctx.fillStyle="#51351f";
- ctx.fillRect(340,155,8,28);
- ctx.fillRect(415,155,8,28);
-
- // Park lambası
- ctx.fillStyle="#44404c";
- ctx.fillRect(480,75,8,100);
- ctx.fillStyle="#ffe477";
- ctx.beginPath();
- ctx.arc(484,70,15,0,Math.PI*2);
- ctx.fill();
+ drawTree(55,270);
+ drawTree(850,270);
 
  // Park tabelası
- ctx.fillStyle="#75502f";
- ctx.fillRect(40,20,7,65);
- ctx.fillStyle="#3e8951";
- ctx.fillRect(10,20,100,38);
+ ctx.fillStyle="#78502f";
+ ctx.fillRect(390,15,8,50);
+ ctx.fillStyle="#37894c";
+ ctx.fillRect(325,13,140,35);
  ctx.fillStyle="white";
- ctx.font="bold 17px Arial";
- ctx.fillText("ŞEHİR PARKI",15,45);
+ ctx.font="bold 19px Arial";
+ ctx.textAlign="center";
+ ctx.fillText("ÇOCUK PARKI",395,38);
+}
+
+// SALINCAK
+function drawSwing(x,y){
+ ctx.strokeStyle="#55515a";
+ ctx.lineWidth=5;
+ ctx.beginPath();
+ ctx.moveTo(x,y);
+ ctx.lineTo(x+95,y);
+ ctx.lineTo(x+85,y+90);
+ ctx.moveTo(x+10,y);
+ ctx.lineTo(x+20,y+90);
+ ctx.stroke();
+
+ ctx.strokeStyle="#d94e65";
+ ctx.lineWidth=3;
+ ctx.beginPath();
+ ctx.moveTo(x+25,y+5);
+ ctx.lineTo(x+30,y+65);
+ ctx.moveTo(x+75,y+5);
+ ctx.lineTo(x+70,y+65);
+ ctx.stroke();
+
+ ctx.fillStyle="#e85d70";
+ ctx.fillRect(x+19,y+65,60,12);
+}
+
+// KAYDIRAK
+function drawSlide(x,y){
+ ctx.fillStyle="#e74e55";
+ ctx.fillRect(x,y,90,12);
+ ctx.fillStyle="#3978c7";
+ ctx.fillRect(x+10,y+10,12,60);
+ ctx.fillRect(x+68,y+10,12,60);
+
+ ctx.fillStyle="#ffcf56";
+ ctx.beginPath();
+ ctx.moveTo(x+10,y+70);
+ ctx.lineTo(x+100,y+70);
+ ctx.lineTo(x+130,y+125);
+ ctx.lineTo(x+45,y+125);
+ ctx.closePath();
+ ctx.fill();
+
+ ctx.fillStyle="#d84c51";
+ ctx.fillRect(x+40,y-5,45,10);
+}
+
+// TAHTEREVALLİ
+function drawSeesaw(x,y){
+ ctx.fillStyle="#79513b";
+ ctx.beginPath();
+ ctx.moveTo(x,y+60);
+ ctx.lineTo(x+35,y+5);
+ ctx.lineTo(x+70,y+60);
+ ctx.fill();
+
+ ctx.save();
+ ctx.translate(x+35,y+5);
+ ctx.rotate(Math.sin(time*1.5)*0.12);
+ ctx.fillStyle="#e85d70";
+ ctx.fillRect(-95,-6,190,12);
+ ctx.fillStyle="#ffe477";
+ ctx.fillRect(-90,-18,12,24);
+ ctx.fillRect(78,-18,12,24);
+ ctx.restore();
+}
+
+// KUM HAVUZU
+function drawSandbox(x,y){
+ ctx.fillStyle="#a36b3e";
+ ctx.fillRect(x,y,130,65);
+ ctx.fillStyle="#f2d19c";
+ ctx.fillRect(x+7,y+7,116,51);
+ circle(x+35,y+35,7,"#dfb875");
+ circle(x+85,y+25,6,"#dfb875");
+ ctx.font="23px Arial";
+ ctx.fillText("🪣",x+85,y+52);
+}
+
+// DÖNME DOLAP
+function drawCarousel(x,y){
+ ctx.save();
+ ctx.translate(x,y);
+ ctx.rotate(time*0.3);
+ ctx.strokeStyle="#e45b67";
+ ctx.lineWidth=6;
+ ctx.beginPath();
+ ctx.arc(0,0,48,0,Math.PI*2);
+ ctx.stroke();
+
+ for(let i=0;i<4;i++){
+  ctx.rotate(Math.PI/2);
+  ctx.fillStyle="#ffe477";
+  ctx.fillRect(-5,-49,10,98);
+ }
+ ctx.restore();
+ circle(x,y,9,"#a34f8a");
 }
 
 function drawTree(x,y){
  ctx.fillStyle="#76502e";
- ctx.fillRect(x-8,y,16,65);
- ctx.fillStyle="#378a45";
- ctx.beginPath();
- ctx.arc(x,y-5,37,0,Math.PI*2);
- ctx.fill();
- ctx.fillStyle="#54a84c";
- ctx.beginPath();
- ctx.arc(x-18,y-17,20,0,Math.PI*2);
- ctx.fill();
+ ctx.fillRect(x-7,y,14,48);
+ circle(x,y-10,28,"#378a45");
+ circle(x-17,y-17,16,"#54a84c");
+ circle(x+16,y-15,17,"#54a84c");
 }
 
-function drawBush(x,y){
- ctx.fillStyle="#398b48";
- ctx.beginPath();
- ctx.arc(x,y,22,0,Math.PI*2);
- ctx.arc(x+18,y+5,18,0,Math.PI*2);
- ctx.arc(x-18,y+5,18,0,Math.PI*2);
- ctx.fill();
-}
-
-// MARKET AMCA
-function drawUncle(){
- // Tezgah
- ctx.fillStyle="#a94c3c";
- ctx.fillRect(710,300,175,95);
- ctx.fillStyle="#ffcf73";
- ctx.fillRect(710,285,175,23);
-
- ctx.fillStyle="#e45e4d";
- for(let i=0;i<5;i++){
-  ctx.fillRect(710+i*35,285,17,23);
- }
-
- ctx.fillStyle="#fff3cb";
- ctx.font="bold 18px Arial";
- ctx.fillText("MARKET AMCA",720,330);
-
- ctx.fillStyle="#9a633e";
- ctx.fillRect(720,345,155,50);
-
- // Amca
- drawHuman(790,255,{
-  color:"#416caa",
-  hair:"#4a3023",
-  name:"Market Amca",
-  crying:false,
-  size:0.85
- });
-}
-
-// İNSAN KARAKTERLERİ
 function drawHuman(x,y,o){
- const s=o.size||1;
-
  ctx.save();
  ctx.translate(x,y);
- ctx.scale(s,s);
 
  // Gölge
  ctx.fillStyle="#0003";
@@ -309,10 +430,8 @@ function drawHuman(x,y,o){
 
  // Gözler
  ctx.fillStyle="#211d26";
- ctx.beginPath();
- ctx.arc(-8,-108,3,0,Math.PI*2);
- ctx.arc(8,-108,3,0,Math.PI*2);
- ctx.fill();
+ circle(-8,-108,3,"#211d26");
+ circle(8,-108,3,"#211d26");
 
  // Ağız
  ctx.strokeStyle="#753c3c";
@@ -324,9 +443,10 @@ function drawHuman(x,y,o){
  // Gözyaşları
  if(o.crying){
   ctx.fillStyle="#20baff";
+  let tearY=Math.sin(time*9)*4;
   ctx.beginPath();
-  ctx.ellipse(-10,-96+(Math.sin(time*9)*4),3,8,0,0,Math.PI*2);
-  ctx.ellipse(10,-96+(Math.sin(time*9+1)*4),3,8,0,0,Math.PI*2);
+  ctx.ellipse(-10,-96+tearY,3,8,0,0,Math.PI*2);
+  ctx.ellipse(10,-96+Math.sin(time*9+1)*4,3,8,0,0,Math.PI*2);
   ctx.fill();
  }
 
@@ -342,20 +462,6 @@ function drawHuman(x,y,o){
  ctx.restore();
 }
 
-function drawPlayer(){
- drawHuman(player.x,player.y,{
-  color:"#287cc4",
-  hair:"#302019",
-  name:"SEN",
-  crying:false
- });
-
- if(hasStick){
-  ctx.font="25px Arial";
-  ctx.fillText("🪵",player.x+22,player.y-65);
- }
-}
-
 function drawNPCs(){
  npcs.forEach(n=>{
   if(!n.caught){
@@ -365,92 +471,93 @@ function drawNPCs(){
     name:n.name,
     crying:true
    });
-  }else{
-   drawHuman(n.x,n.y,{
-    color:n.color,
-    hair:n.hair,
-    name:n.name+" 😊",
-    crying:true
-   });
   }
  });
+}
+
+function drawPlayer(){
+ drawHuman(player.x,player.y,{
+  color:"#287cc4",
+  hair:"#302019",
+  name:"YOUTUBER ABİ",
+  crying:false
+ });
+
+ if(hasStick){
+  ctx.font="25px Arial";
+  ctx.fillText("🪵",player.x+25,player.y-65);
+ }
 }
 
 function render(){
  ctx.clearRect(0,0,W,H);
  drawPark();
- drawUncle();
  drawNPCs();
  drawPlayer();
-
- if(gameWon){
-  ctx.fillStyle="#38234e";
-  ctx.fillRect(190,200,520,100);
-  ctx.fillStyle="#ffe477";
-  ctx.font="bold 29px Arial";
-  ctx.textAlign="center";
-  ctx.fillText("🎉 İKİSİNİ DE YAKALADIN!",450,260);
- }
 }
 
-// KONTROLLER
+// OYUNCU HAREKETİ
 function updatePlayer(dt){
- let dx=0,dy=0;
+ let dx=joy.x;
+ let dy=joy.y;
 
- if(keys["w"]||keys["arrowup"]||touch.up)dy--;
- if(keys["s"]||keys["arrowdown"]||touch.down)dy++;
- if(keys["a"]||keys["arrowleft"]||touch.left)dx--;
- if(keys["d"]||keys["arrowright"]||touch.right)dx++;
+ if(keys["w"]||keys["arrowup"])dy-=1;
+ if(keys["s"]||keys["arrowdown"])dy+=1;
+ if(keys["a"]||keys["arrowleft"])dx-=1;
+ if(keys["d"]||keys["arrowright"])dx+=1;
 
- if(dx&&dy){
-  dx*=0.7071;
-  dy*=0.7071;
+ let len=Math.hypot(dx,dy);
+ if(len>1){
+  dx/=len;
+  dy/=len;
  }
 
  player.x+=dx*player.speed*dt;
  player.y+=dy*player.speed*dt;
 
- player.x=Math.max(25,Math.min(W-25,player.x));
- player.y=Math.max(190,Math.min(H-15,player.y));
+ player.x=Math.max(40,Math.min(W-40,player.x));
+ player.y=Math.max(185,Math.min(H-40,player.y));
 }
 
 // RAKUN VE NÖR KAÇIYOR
 function updateNPCs(dt){
  npcs.forEach(n=>{
-  if(n.caught)return;
+  if(n.caught){
+   n.cooldown-=dt;
+   if(n.cooldown<=0){
+    n.caught=false;
+    n.x=100+Math.random()*700;
+    n.y=190+Math.random()*280;
+    say(n.name+" tekrar kaçmaya başladı! 😂");
+   }
+   return;
+  }
 
   let dx=n.x-player.x;
   let dy=n.y-player.y;
   let d=Math.hypot(dx,dy)||1;
 
-  // Oyuncudan kaçış
-  if(d<260){
+  if(d<280){
    n.x+=(dx/d)*n.speed*dt;
    n.y+=(dy/d)*n.speed*dt;
   }else{
-   // Uzakta gezinme
    n.phase+=dt;
-   n.x+=Math.sin(n.phase)*n.speed*0.35*dt;
-   n.y+=Math.cos(n.phase*0.8)*n.speed*0.35*dt;
+   n.x+=Math.sin(n.phase)*n.speed*.35*dt;
+   n.y+=Math.cos(n.phase*.8)*n.speed*.35*dt;
   }
 
-  n.x=Math.max(35,Math.min(W-35,n.x));
-  n.y=Math.max(185,Math.min(H-20,n.y));
+  n.x=Math.max(40,Math.min(W-40,n.x));
+  n.y=Math.max(185,Math.min(H-40,n.y));
 
-  // Yakalama
-  if(distance(player,n)<34){
+  // YAKALAMA
+  if(distance(player,n)<35){
    if(hasStick){
     n.caught=true;
+    n.cooldown=2.5;
     caughtCount++;
 
-    document.getElementById("caught").textContent=caughtCount+"/2";
-
-    say(n.name+": YouTuber abi, özür dilerim! 😭");
-
-    if(caughtCount===2){
-     gameWon=true;
-     say("🎉 İkisini de yakaladın! Ağlayan Rakun ve Ağlayan Nör: YouTuber abi, özür dileriz!");
-    }
+    document.getElementById("caught").textContent=caughtCount;
+    say(n.name+": YouTuber abi, özür dilerim! 😂😭");
    }else{
     say("Önce Market Amca'dan bedava sopayı almalısın!");
    }
@@ -458,41 +565,61 @@ function updateNPCs(dt){
  });
 }
 
-// AMCA İLE ETKİLEŞİM
-function getStick(){
- hasStick=true;
- document.getElementById("inventory").textContent="Var 🪵";
- document.getElementById("stick").textContent="🪵 ✅";
- say("Market Amca: Sopayı bedava verdim! Şimdi Ağlayan Rakun ve Ağlayan Nör'ü yakalayabilirsin!");
+// JOYSTICK SİSTEMİ
+const joystick=document.getElementById("joystick");
+const thumb=document.getElementById("thumb");
+let pointerId=null;
+
+function setJoystick(e){
+ const rect=joystick.getBoundingClientRect();
+ const cx=rect.left+rect.width/2;
+ const cy=rect.top+rect.height/2;
+
+ let dx=e.clientX-cx;
+ let dy=e.clientY-cy;
+
+ let max=43;
+ let len=Math.hypot(dx,dy);
+
+ if(len>max){
+  dx=dx/len*max;
+  dy=dy/len*max;
+ }
+
+ joy.x=dx/max;
+ joy.y=dy/max;
+
+ thumb.style.transform=
+  "translate("+dx+"px,"+dy+"px)";
 }
 
-document.getElementById("get").onclick=getStick;
-
-function interact(){
- if(distance(player,uncle)<115){
-  say("Market Amca: Evlatlar, neden ağlıyorsunuz? Size bedava bir sopa verdim!");
-  return;
- }
-
- if(!hasStick){
-  say("Önce market amcadan bedava sopayı almalısın!");
-  return;
- }
-
- for(const n of npcs){
-  if(!n.caught && distance(player,n)<75){
-   say(n.name+": YouTuber abi, özür dilerim!");
-   return;
-  }
- }
-
- say("Biraz daha yaklaşmalısın! Rakun ve Nör kaçıyor! 😂");
+function resetJoystick(){
+ pointerId=null;
+ joy.x=0;
+ joy.y=0;
+ thumb.style.transform="translate(0,0)";
 }
 
-document.getElementById("interact").onclick=interact;
+joystick.addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ pointerId=e.pointerId;
+ joystick.setPointerCapture(pointerId);
+ setJoystick(e);
+});
 
+joystick.addEventListener("pointermove",e=>{
+ if(pointerId===e.pointerId){
+  setJoystick(e);
+ }
+});
+
+joystick.addEventListener("pointerup",resetJoystick);
+joystick.addEventListener("pointercancel",resetJoystick);
+joystick.addEventListener("lostpointercapture",resetJoystick);
+
+// KLAVYE
 document.addEventListener("keydown",e=>{
- const k=e.key.toLowerCase();
+ let k=e.key.toLowerCase();
  if(["arrowup","arrowdown","arrowleft","arrowright"," "].includes(k)){
   e.preventDefault();
  }
@@ -504,26 +631,40 @@ document.addEventListener("keyup",e=>{
  keys[e.key.toLowerCase()]=false;
 });
 
-// TELEFON KONTROLLERİ
-document.querySelectorAll("[data-dir]").forEach(btn=>{
- const dir=btn.dataset.dir;
+// MARKET
+function getStick(){
+ if(hasStick){
+  say("Market Amca: Sopayı zaten verdim evladım! 😂");
+  return;
+ }
 
- btn.addEventListener("pointerdown",e=>{
-  e.preventDefault();
-  touch[dir]=true;
- });
+ hasStick=true;
+ document.getElementById("inventory").textContent="Var 🪵";
+ document.getElementById("stick").textContent="🪵 ✅";
+ say("Market Amca: Sopayı bedava verdim! Şimdi Rakun ve Nör'ü yakalayabilirsin!");
+}
 
- ["pointerup","pointerleave","pointercancel"].forEach(ev=>{
-  btn.addEventListener(ev,()=>{
-   touch[dir]=false;
-  });
- });
-});
+document.getElementById("get").onclick=getStick;
 
+// ETKİLEŞİM
+function interact(){
+ for(const n of npcs){
+  if(!n.caught && distance(player,n)<85){
+   say(n.name+": YouTuber abi, özür dilerim!");
+   return;
+  }
+ }
+
+ say("YouTuber Abi: Nerdesiniz bakalım? 😂");
+}
+
+document.getElementById("interact").onclick=interact;
+
+// OYUN DÖNGÜSÜ
 let last=0;
 
 function loop(timestamp){
- const dt=Math.min((timestamp-last)/1000||0,0.04);
+ let dt=Math.min((timestamp-last)/1000||0,0.04);
  last=timestamp;
  time+=dt;
 
